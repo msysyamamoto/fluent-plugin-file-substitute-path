@@ -1,3 +1,6 @@
+require 'fileutils'
+require 'zlib'
+
 module Fluent
   class FileSubstitutePath < FileOutput
     Plugin.register_output('file_substitute_path', self)
@@ -17,7 +20,7 @@ module Fluent
     def write(chunk)
       paths = {}
       chunk.msgpack_each do |(extend_path, data)|
-        path = generate_path(chunk.key, extend_path)
+        path = build_path(chunk.key, extend_path)
         if paths.has_key?(path)
           paths[path] += data
         else
@@ -26,6 +29,8 @@ module Fluent
       end
 
       paths.each do |path, data|
+        FileUtils.mkdir_p(File.dirname(path), mode: DEFAULT_DIR_PERMISSION)
+
         case @compress
         when nil
           File.open(path, "a", DEFAULT_FILE_PERMISSION) {|f| f.write(data)}
@@ -46,7 +51,7 @@ module Fluent
       end
     end
 
-    def generate_path(time_string, extend_path)
+    def build_path(time_string, extend_path)
       if @append
         "#{@path}#{extend_path}.#{time_string}#{@path_suffix}#{suffix}"
       else
