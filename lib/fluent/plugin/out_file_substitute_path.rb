@@ -2,7 +2,7 @@ require 'fileutils'
 require 'zlib'
 
 module Fluent
-  class FileSubstitutePath < FileOutput
+  class FileSubstitutePathOutput < FileOutput
     Plugin.register_output('file_substitute_path', self)
 
     config_param :extend_path_key, :string, default: "extend_path"
