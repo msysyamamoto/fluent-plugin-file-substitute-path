@@ -14,7 +14,13 @@ module Fluent
 
     def format(tag, time, record)
       data = @formatter.format(tag, time, record)
-      [record[@extend_path_key], data].to_msgpack
+      extend_path = record[@extend_path_key]
+
+      unless extend_path
+        log.warn("Undefined extend_path_key: #{@extend_path_key}.")
+      end
+
+      [extend_path, data].to_msgpack
     end
 
     def write(chunk)
