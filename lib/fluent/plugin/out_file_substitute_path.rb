@@ -14,13 +14,15 @@ module Fluent
     end
 
     def format(tag, time, record)
-      data = @formatter.format(tag, time, record)
-      extend_path = record[@extend_path_key]
-
-      unless extend_path
-        log.warn("Undefined extend_path_key: #{@extend_path_key}.")
+      unless record.has_key?(@extend_path_key)
+        log.warn("Undefined extend_path_key: #{@extend_path_key} ")
       end
 
+      dup = record.dup
+      extend_path = dup[@extend_path_key]
+      dup.delete(@extend_path_key)
+
+      data = @formatter.format(tag, time, dup)
       [extend_path, data].to_msgpack
     end
 
