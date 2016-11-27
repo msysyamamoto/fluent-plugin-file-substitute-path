@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'zlib'
+require 'fluent/plugin/out_file'
 
 module Fluent
   class FileSubstitutePathOutput < FileOutput
