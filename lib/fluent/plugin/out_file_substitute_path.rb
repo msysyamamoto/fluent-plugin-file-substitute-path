@@ -45,8 +45,10 @@ module Fluent
           File.open(path, "a", DEFAULT_FILE_PERMISSION) {|f| f.write(data)}
         when :gz
           Zlib::GzipWriter.open(path) {|gz| gz.write(data)}
-       end
+        end
       end
+
+      paths.keys # for test
     end
     
     private
