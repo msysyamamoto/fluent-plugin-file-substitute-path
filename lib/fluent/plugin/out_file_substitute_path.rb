@@ -1,35 +1,56 @@
-require 'fileutils'
-require 'zlib'
-require 'fluent/plugin/out_file'
 
 module Fluent
-  class FileSubstitutePathOutput < FileOutput
-    Plugin.register_output('file_substitute_path', self)
+  class FileSubstitutePathOutput < Fluent::TimeSlicedOutput
+    Plugin.register_output("file_substitute_path", self)
 
-    config_param :extend_path_key, :string, default: "extend_path"
+    SUPPORTED_COMPRESS = {
+      :gz => :gz,
+      :gzip => :gz,
+    }
+
+    config_set_default :time_slice_format, "%Y%m%d"
+
+    config_param :compress, :default => nil do |val|
+      c = SUPPORTED_COMPRESS[val.to_sym]
+      raise ConfigError, "Unsupported compression algorithm '#{compress}'" unless c
+      c
+    end
+
+    config_param :symlink_path, :string, :default => nil # TODO
+    config_param :format, :string, default: 'out_file'
+    config_param :path_key, :string, default: "path"
+
+    def initialize
+      require 'zlib'
+      require 'time'
+      require 'fluent/plugin/file_util'
+      super
+    end
 
     def configure(conf)
       super
-      @extend_path_key = conf['extend_path_key']
+      
+      @formatter = Plugin.new_formatter(@format)
+      @formatter.configure(conf)
     end
 
     def format(tag, time, record)
-      unless record.has_key?(@extend_path_key)
-        log.warn("Undefined extend_path_key: #{@extend_path_key} ")
+      unless record.has_key?(@path_key)
+        log.warn("Undefined key: #{@path_key}")
       end
 
+      path = record[@path_key]
       dup = record.dup
-      extend_path = dup[@extend_path_key]
-      dup.delete(@extend_path_key)
+      dup.delete(@path_key)
 
       data = @formatter.format(tag, time, dup)
-      [extend_path, data].to_msgpack
+      [path, data].to_msgpack
     end
 
     def write(chunk)
       paths = {}
-      chunk.msgpack_each do |(extend_path, data)|
-        path = build_path(chunk.key, extend_path)
+      chunk.msgpack_each do |(path, data)|
+        path = generate_path(chunk.key, path)
         if paths.has_key?(path)
           paths[path] += data
         else
@@ -62,14 +83,28 @@ module Fluent
       end
     end
 
-    def build_path(time_string, extend_path)
+    def generate_path(time_string, path)
+
+      path_prefix = ''
+      path_suffix = ''
+
+      if pos = path.index('*')
+        path_prefix = path[0,pos]
+        path_suffix = path[pos+1..-1]
+        #conf['buffer_path'] ||= "#{@path}"
+      else
+        path_prefix = path+"."
+        path_suffix = ".log"
+        #conf['buffer_path'] ||= "#{@path}.*"
+      end
+
       if @append
-        "#{@path}#{extend_path}.#{time_string}#{@path_suffix}#{suffix}"
+        "#{path_prefix}#{time_string}#{path_suffix}#{suffix}"
       else
         path = nil
         i = 0
         begin
-          path = "#{@path}#{extend_path}.#{time_string}_#{i}#{@path_suffix}#{suffix}"
+          path = "#{path_prefix}#{time_string}_#{i}#{path_suffix}#{suffix}"
           i += 1
         end while File.exist?(path)
         path
