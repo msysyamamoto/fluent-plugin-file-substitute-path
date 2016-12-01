@@ -33,13 +33,14 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
     d.run
   end
   
-  def test_write
+  def test_write_txt
     d = create_driver %[
       path_key expath
       format hash
       buffer_path #{TMP_DIR}/test.*.buf
       time_slice_format %Y%m%d%H%M%S
     ]
+
     time = Time.parse('2016-11-12 13:14:15 UTC')
     d.emit({'expath' => "#{TMP_DIR}/access.log", 'message' => 'Hello'}, time.to_i)
     d.emit({'expath' => "#{TMP_DIR}/error.log", 'message' => 'Oops'}, time.to_i)
@@ -48,5 +49,96 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
     paths = d.run
     assert_equal "#{TMP_DIR}/access.log." + time.strftime('%Y%m%d%H%M%S_0.log'), paths[0][0]
     assert_equal "#{TMP_DIR}/error.log." + time.strftime('%Y%m%d%H%M%S_0.log'), paths[0][1]
+  end
+
+  def test_write_gz
+    d = create_driver %[
+      path_key expath
+      format hash
+      buffer_path #{TMP_DIR}/test.*.buf
+      time_slice_format %Y%m%d%H%M%S
+      compress gzip
+    ]
+
+    time = Time.parse('2016-11-12 13:14:15 UTC')
+    d.emit({'expath' => "#{TMP_DIR}/access.log", 'message' => 'Hello'}, time.to_i)
+    d.emit({'expath' => "#{TMP_DIR}/error.log", 'message' => 'Oops'}, time.to_i)
+    d.expect_format ["#{TMP_DIR}/access.log", {'message' => 'Hello'}.to_s + "\n"].to_msgpack
+    d.expect_format ["#{TMP_DIR}/error.log", {'message' => 'Oops'}.to_s + "\n"].to_msgpack
+    paths = d.run
+    assert_equal "#{TMP_DIR}/access.log." + time.strftime('%Y%m%d%H%M%S_0.log.gz'), paths[0][0]
+    assert_equal "#{TMP_DIR}/error.log." + time.strftime('%Y%m%d%H%M%S_0.log.gz'), paths[0][1]
+  end
+
+  def test_write_txt_append
+    conf = %[
+      path_key expath
+      format hash
+      buffer_path #{TMP_DIR}/test.*.buf
+      time_slice_format %Y%m%d
+      append true
+    ]
+
+    time = Time.parse('2016-11-12 13:14:15 UTC')
+    expect_path = "#{TMP_DIR}/access.log." + time.strftime('%Y%m%d.log')
+
+    d1 = create_driver conf
+    d1.emit({'expath' => "#{TMP_DIR}/access.log", 'message' => '1'}, time.to_i)
+    paths = d1.run
+    assert_equal expect_path, paths[0][0]
+
+    d2 = create_driver conf
+    time = Time.parse('2016-11-12 16:17:18 UTC')
+    d2.emit({'expath' => "#{TMP_DIR}/access.log", 'message' => '2'}, time.to_i)
+    paths = d2.run
+    assert_equal expect_path, paths[0][0]
+
+    contents = File.read(expect_path)
+    assert_equal "{\"message\"=>\"1\"}\n{\"message\"=>\"2\"}\n", contents
+  end
+
+  def test_write_gz_append
+    conf = %[
+      path_key expath
+      format hash
+      buffer_path #{TMP_DIR}/test.*.buf
+      time_slice_format %Y%m%d
+      append true
+      compress gzip
+    ]
+
+    time = Time.parse('2016-11-12 13:14:15 UTC')
+    expect_path = "#{TMP_DIR}/access.log." + time.strftime('%Y%m%d.log.gz')
+
+    d1 = create_driver conf
+    d1.emit({'expath' => "#{TMP_DIR}/access.log", 'message' => '1'}, time.to_i)
+    paths = d1.run
+    assert_equal expect_path, paths[0][0]
+
+    d2 = create_driver conf
+    time = Time.parse('2016-11-12 16:17:18 UTC')
+    d2.emit({'expath' => "#{TMP_DIR}/access.log", 'message' => '2'}, time.to_i)
+    paths = d2.run
+    assert_equal expect_path, paths[0][0]
+
+    contents = read_gzipped_file(expect_path)
+    assert_equal "{\"message\"=>\"1\"}\n{\"message\"=>\"2\"}\n", contents
+  end
+
+  def read_gzipped_file(path)
+    # Zlib::GzipReader has a bug of concatenated file: https://bugs.ruby-lang.org/issues/9790
+    # Following code from https://www.ruby-forum.com/topic/971591#979520
+    result = ''
+    File.open(path) { |io|
+      loop do
+        gzr = Zlib::GzipReader.new(io)
+        result << gzr.read
+        unused = gzr.unused
+        gzr.finish
+        break if unused.nil?
+        io.pos -= unused.length
+      end
+    }
+    result
   end
 end

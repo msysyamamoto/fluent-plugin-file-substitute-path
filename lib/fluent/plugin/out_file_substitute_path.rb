@@ -19,6 +19,7 @@ module Fluent
     config_param :symlink_path, :string, :default => nil # TODO
     config_param :format, :string, default: 'out_file'
     config_param :path_key, :string, default: "path"
+    config_param :append, :bool, default: false
 
     def initialize
       require 'zlib'
@@ -65,7 +66,9 @@ module Fluent
         when nil
           File.open(path, "a", DEFAULT_FILE_PERMISSION) {|f| f.write(data)}
         when :gz
-          Zlib::GzipWriter.open(path) {|gz| gz.write(data)}
+          File.open(path, "a", DEFAULT_FILE_PERMISSION) do |f|
+            Zlib::GzipWriter.wrap(f) {|gz| gz.write(data)}
+          end
         end
       end
 
@@ -91,11 +94,9 @@ module Fluent
       if pos = path.index('*')
         path_prefix = path[0,pos]
         path_suffix = path[pos+1..-1]
-        #conf['buffer_path'] ||= "#{@path}"
       else
         path_prefix = path+"."
         path_suffix = ".log"
-        #conf['buffer_path'] ||= "#{@path}.*"
       end
 
       if @append
