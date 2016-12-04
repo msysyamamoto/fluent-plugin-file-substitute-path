@@ -126,6 +126,8 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
   end
 
   def read_gzipped_file(path)
+    # This is a copy from https://github.com/fluent/fluentd/blob/87015e1dbcd31b7e40d7387c5cfb3a228635df49/test/plugin/test_out_file.rb#L327-L339
+    #
     # Zlib::GzipReader has a bug of concatenated file: https://bugs.ruby-lang.org/issues/9790
     # Following code from https://www.ruby-forum.com/topic/971591#979520
     result = ''
@@ -139,6 +141,7 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
         io.pos -= unused.length
       end
     }
+
     result
   end
 end
