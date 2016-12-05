@@ -16,18 +16,11 @@ module Fluent
       c
     end
 
-    config_param :symlink_path, :string, :default => nil # TODO
     config_param :format, :string, default: 'out_file'
     config_param :path_key, :string, default: "path"
     config_param :append, :bool, default: false
-
-    def initialize
-      require 'zlib'
-      require 'time'
-      require 'fluent/plugin/file_util'
-      super
-    end
-
+    config_param :root_dir, :string, defalut: "/tmp/"
+    
     def configure(conf)
       super
       
