@@ -19,11 +19,10 @@ module Fluent
     config_param :format, :string, default: 'out_file'
     config_param :path_key, :string, default: "path"
     config_param :append, :bool, default: false
-    config_param :root_dir, :string, defalut: "/tmp/"
+    config_param :root_dir, :string, default: "/tmp"
     
     def configure(conf)
-      super
-      
+      super      
       @formatter = Plugin.new_formatter(@format)
       @formatter.configure(conf)
     end
@@ -92,17 +91,18 @@ module Fluent
         path_suffix = ".log"
       end
 
+      path = nil
       if @append
-        "#{path_prefix}#{time_string}#{path_suffix}#{suffix}"
+        path = "#{@root_dir}/#{path_prefix}#{time_string}#{path_suffix}#{suffix}"
       else
-        path = nil
         i = 0
         begin
-          path = "#{path_prefix}#{time_string}_#{i}#{path_suffix}#{suffix}"
+          path = "#{@root_dir}/#{path_prefix}#{time_string}_#{i}#{path_suffix}#{suffix}"
           i += 1
         end while File.exist?(path)
-        path
       end
+
+      File.expand_path(path)
     end
   end
 end
