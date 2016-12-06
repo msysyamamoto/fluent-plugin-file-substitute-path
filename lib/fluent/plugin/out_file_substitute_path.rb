@@ -1,14 +1,14 @@
 
 module Fluent
   class FileSubstitutePathOutput < Fluent::TimeSlicedOutput
-    Plugin.register_output("file_substitute_path", self)
+    Plugin.register_output('file_substitute_path', self)
 
     SUPPORTED_COMPRESS = {
       :gz => :gz,
       :gzip => :gz,
     }
 
-    config_set_default :time_slice_format, "%Y%m%d"
+    config_set_default :time_slice_format, '%Y%m%d'
 
     config_param :compress, :default => nil do |val|
       c = SUPPORTED_COMPRESS[val.to_sym]
@@ -17,14 +17,21 @@ module Fluent
     end
 
     config_param :format, :string, default: 'out_file'
-    config_param :path_key, :string, default: "path"
+    config_param :path_key, :string, default: 'path'
     config_param :append, :bool, default: false
-    config_param :root_dir, :string, default: "/tmp"
+    config_param :root_dir, :string, default: '/tmp'
     
     def configure(conf)
       super      
       @formatter = Plugin.new_formatter(@format)
       @formatter.configure(conf)
+
+      @suffix = case @compress
+        when nil
+          ''
+        when :gz
+          '.gz'
+      end
     end
 
     def format(tag, time, record)
@@ -56,9 +63,9 @@ module Fluent
 
         case @compress
         when nil
-          File.open(path, "a", DEFAULT_FILE_PERMISSION) {|f| f.write(data)}
+          File.open(path, 'a', DEFAULT_FILE_PERMISSION) {|f| f.write(data)}
         when :gz
-          File.open(path, "a", DEFAULT_FILE_PERMISSION) do |f|
+          File.open(path, 'a', DEFAULT_FILE_PERMISSION) do |f|
             Zlib::GzipWriter.wrap(f) {|gz| gz.write(data)}
           end
         end
@@ -69,15 +76,6 @@ module Fluent
     
     private
 
-    def suffix
-      case @compress
-      when nil
-        ''
-      when :gz
-        ".gz"
-      end
-    end
-
     def generate_path(time_string, path)
 
       path_prefix = ''
@@ -87,22 +85,22 @@ module Fluent
         path_prefix = path[0,pos]
         path_suffix = path[pos+1..-1]
       else
-        path_prefix = path+"."
-        path_suffix = ".log"
+        path_prefix = path+'.'
+        path_suffix = '.log'
       end
 
       path = nil
       if @append
-        path = "#{@root_dir}/#{path_prefix}#{time_string}#{path_suffix}#{suffix}"
+        path = "#{@root_dir}/#{path_prefix}#{time_string}#{path_suffix}#{@suffix}"
       else
         i = 0
         begin
-          path = "#{@root_dir}/#{path_prefix}#{time_string}_#{i}#{path_suffix}#{suffix}"
+          path = "#{@root_dir}/#{path_prefix}#{time_string}_#{i}#{path_suffix}#{@suffix}"
           i += 1
         end while File.exist?(path)
       end
 
-      File.expand_path(path)
+      path
     end
   end
 end

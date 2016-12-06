@@ -29,8 +29,8 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
   def test_format
     d = create_driver
 
-    d.emit({'expath' => "/a/b/c", 'foo' => 'bar'}, Time.now.to_i)
-    d.expect_format ["/a/b/c", {'foo' => 'bar'}.to_s + "\n"].to_msgpack
+    d.emit({'expath' => "a/b/c", 'foo' => 'bar'}, Time.now.to_i)
+    d.expect_format ["a/b/c", {'foo' => 'bar'}.to_s + "\n"].to_msgpack
     d.run
   end
   
@@ -44,13 +44,13 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
     ]
 
     time = Time.parse('2016-11-12 13:14:15 UTC')
-    d.emit({'expath' => "/access.log", 'message' => 'Hello'}, time.to_i)
-    d.emit({'expath' => "/error.log", 'message' => 'Oops'}, time.to_i)
-    d.expect_format ["/access.log", {'message' => 'Hello'}.to_s + "\n"].to_msgpack
-    d.expect_format ["/error.log", {'message' => 'Oops'}.to_s + "\n"].to_msgpack
+    d.emit({'expath' => "access.log", 'message' => 'Hello'}, time.to_i)
+    d.emit({'expath' => "error.log", 'message' => 'Oops'}, time.to_i)
+    d.expect_format ["access.log", {'message' => 'Hello'}.to_s + "\n"].to_msgpack
+    d.expect_format ["error.log", {'message' => 'Oops'}.to_s + "\n"].to_msgpack
     paths = d.run
-    assert_equal File.expand_path("#{TMP_DIR}/access.log." + time.strftime('%Y%m%d%H%M%S_0.log')), paths[0][0]
-    assert_equal File.expand_path("#{TMP_DIR}/error.log." + time.strftime('%Y%m%d%H%M%S_0.log')), paths[0][1]
+    assert_equal "#{TMP_DIR}/access.log." + time.strftime('%Y%m%d%H%M%S_0.log'), paths[0][0]
+    assert_equal "#{TMP_DIR}/error.log." + time.strftime('%Y%m%d%H%M%S_0.log'), paths[0][1]
   end
 
   def test_write_gz
@@ -64,13 +64,13 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
     ]
 
     time = Time.parse('2016-11-12 13:14:15 UTC')
-    d.emit({'expath' => "/access.log", 'message' => 'Hello'}, time.to_i)
-    d.emit({'expath' => "/error.log", 'message' => 'Oops'}, time.to_i)
-    d.expect_format ["/access.log", {'message' => 'Hello'}.to_s + "\n"].to_msgpack
-    d.expect_format ["/error.log", {'message' => 'Oops'}.to_s + "\n"].to_msgpack
+    d.emit({'expath' => "access.log", 'message' => 'Hello'}, time.to_i)
+    d.emit({'expath' => "error.log", 'message' => 'Oops'}, time.to_i)
+    d.expect_format ["access.log", {'message' => 'Hello'}.to_s + "\n"].to_msgpack
+    d.expect_format ["error.log", {'message' => 'Oops'}.to_s + "\n"].to_msgpack
     paths = d.run
-    assert_equal File.expand_path("#{TMP_DIR}/access.log." + time.strftime('%Y%m%d%H%M%S_0.log.gz')), paths[0][0]
-    assert_equal File.expand_path("#{TMP_DIR}/error.log." + time.strftime('%Y%m%d%H%M%S_0.log.gz')), paths[0][1]
+    assert_equal "#{TMP_DIR}/access.log." + time.strftime('%Y%m%d%H%M%S_0.log.gz'), paths[0][0]
+    assert_equal "#{TMP_DIR}/error.log." + time.strftime('%Y%m%d%H%M%S_0.log.gz'), paths[0][1]
   end
 
   def test_write_txt_append
@@ -84,16 +84,16 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
     ]
 
     time = Time.parse('2016-11-12 13:14:15 UTC')
-    expect_path = File.expand_path("#{TMP_DIR}/access.log." + time.strftime('%Y%m%d.log'))
+    expect_path = "#{TMP_DIR}/access.log." + time.strftime('%Y%m%d.log')
 
     d1 = create_driver conf
-    d1.emit({'expath' => "/access.log", 'message' => '1'}, time.to_i)
+    d1.emit({'expath' => "access.log", 'message' => '1'}, time.to_i)
     paths = d1.run
     assert_equal expect_path, paths[0][0]
 
     d2 = create_driver conf
     time = Time.parse('2016-11-12 16:17:18 UTC')
-    d2.emit({'expath' => "/access.log", 'message' => '2'}, time.to_i)
+    d2.emit({'expath' => "access.log", 'message' => '2'}, time.to_i)
     paths = d2.run
     assert_equal expect_path, paths[0][0]
 
@@ -113,16 +113,16 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
     ]
 
     time = Time.parse('2016-11-12 13:14:15 UTC')
-    expect_path = File.expand_path("#{TMP_DIR}/access.log." + time.strftime('%Y%m%d.log.gz'))
+    expect_path = "#{TMP_DIR}/access.log." + time.strftime('%Y%m%d.log.gz')
 
     d1 = create_driver conf
-    d1.emit({'expath' => "/access.log", 'message' => '1'}, time.to_i)
+    d1.emit({'expath' => "access.log", 'message' => '1'}, time.to_i)
     paths = d1.run
     assert_equal expect_path, paths[0][0]
 
     d2 = create_driver conf
     time = Time.parse('2016-11-12 16:17:18 UTC')
-    d2.emit({'expath' => "/access.log", 'message' => '2'}, time.to_i)
+    d2.emit({'expath' => "access.log", 'message' => '2'}, time.to_i)
     paths = d2.run
     assert_equal expect_path, paths[0][0]
 
