@@ -1,16 +1,16 @@
-
 module Fluent
+  # fluent-plugin-file-substitute-path
   class FileSubstitutePathOutput < Fluent::TimeSlicedOutput
     Plugin.register_output('file_substitute_path', self)
 
     SUPPORTED_COMPRESS = {
-      :gz => :gz,
-      :gzip => :gz,
-    }
+      gz: :gz,
+      gzip: :gz
+    }.freeze
 
     config_set_default :time_slice_format, '%Y%m%d'
 
-    config_param :compress, :default => nil do |val|
+    config_param :compress, default: nil do |val|
       c = SUPPORTED_COMPRESS[val.to_sym]
       raise ConfigError, "Unsupported compression algorithm '#{compress}'" unless c
       c
@@ -20,24 +20,22 @@ module Fluent
     config_param :path_key, :string, default: 'path'
     config_param :append, :bool, default: false
     config_param :root_dir, :string, default: '/tmp'
-    
+
     def configure(conf)
-      super      
+      super
       @formatter = Plugin.new_formatter(@format)
       @formatter.configure(conf)
 
       @suffix = case @compress
-        when nil
-          ''
-        when :gz
-          '.gz'
-      end
+                when nil
+                  ''
+                when :gz
+                  '.gz'
+                end
     end
 
     def format(tag, time, record)
-      unless record.has_key?(@path_key)
-        log.warn("Undefined key: #{@path_key}")
-      end
+      log.warn("Undefined key: #{@path_key}") unless record.key?(@path_key)
 
       path = record[@path_key]
       dup = record.dup
@@ -51,7 +49,7 @@ module Fluent
       paths = {}
       chunk.msgpack_each do |(path, data)|
         path = generate_path(chunk.key, path)
-        if paths.has_key?(path)
+        if paths.key?(path)
           paths[path] += data
         else
           paths[path] = data
@@ -63,29 +61,28 @@ module Fluent
 
         case @compress
         when nil
-          File.open(path, 'a', DEFAULT_FILE_PERMISSION) {|f| f.write(data)}
+          File.open(path, 'a', DEFAULT_FILE_PERMISSION) { |f| f.write(data) }
         when :gz
           File.open(path, 'a', DEFAULT_FILE_PERMISSION) do |f|
-            Zlib::GzipWriter.wrap(f) {|gz| gz.write(data)}
+            Zlib::GzipWriter.wrap(f) { |gz| gz.write(data) }
           end
         end
       end
 
       paths.keys # for test
     end
-    
+
     private
 
     def generate_path(time_string, path)
-
       path_prefix = ''
       path_suffix = ''
 
       if pos = path.index('*')
-        path_prefix = path[0,pos]
-        path_suffix = path[pos+1..-1]
+        path_prefix = path[0, pos]
+        path_suffix = path[pos + 1..-1]
       else
-        path_prefix = path+'.'
+        path_prefix = path + '.'
         path_suffix = '.log'
       end
 
