@@ -1,5 +1,4 @@
 module Fluent
-  # fluent-plugin-file-substitute-path
   class FileSubstitutePathOutput < Fluent::TimeSlicedOutput
     Plugin.register_output('file_substitute_path', self)
 
@@ -7,8 +6,6 @@ module Fluent
       gz: :gz,
       gzip: :gz
     }.freeze
-
-    config_set_default :time_slice_format, '%Y%m%d'
 
     config_param :compress, default: nil do |val|
       c = SUPPORTED_COMPRESS[val.to_sym]
@@ -18,7 +15,7 @@ module Fluent
 
     config_param :format, :string, default: 'out_file'
     config_param :path_key, :string, default: 'path'
-    config_param :append, :bool, default: false
+    config_param :append, :bool, default: true
     config_param :root_dir, :string, default: '/tmp'
 
     def configure(conf)

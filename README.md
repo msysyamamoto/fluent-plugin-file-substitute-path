@@ -18,15 +18,62 @@ Or install it yourself as:
 
     $ gem install fluent-plugin-file-substitute-path
 
-## Usage
+## Configuration
 
-TODO: Write usage instructions here
+### root_dir
 
-## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+### path_key
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Set the key of the field where part of the path is stored.
+
+### append
+
+If set to `true`, append the data to the file. The default is `true`.
+
+### compress
+
+If set to `gzip`, the output file will be compressed. The default is `nil`.
+
+### format
+
+see [http://docs.fluentd.org/articles/formatter-plugin-overview](http://docs.fluentd.org/articles/formatter-plugin-overview)
+
+### other
+
+This plugin inherit the `Fluent::TimeSlicedOutput` class. So, you can set the configurations of the `Fluent::TimeSlicedOutput` class.
+see [http://docs.fluentd.org/articles/output-plugin-overview#time-sliced-output-parameters](http://docs.fluentd.org/articles/output-plugin-overview#time-sliced-output-parameters)
+
+## Examples
+
+```apache
+<match dummy>
+    @type file_substitute_path
+    root_dir /var/log/subs
+    path_key path_is_here
+</match>
+```
+
+If your inputs is
+
+```json
+{"path_is_here": "/oh/my/log", "message": "hello"}
+{"path_is_here": "/path/to/file", "message": "world"}
+```
+
+File is created as follows
+
+```bash
+$ find /var/log/subs/**/*.log
+/var/log/subs/oh/my/log.2016121314.log
+/var/log/subs/path/to/file.2016121314.log
+
+$ cat /var/log/subs/oh/my/log.2016121314.log
+2016-12-13T14:15:16[TAB]dummy[TAB]{"message":"hello"}
+
+$ cat /var/log/subs/path/to/file.2016121314.log
+2016-12-13T14:15:17[TAB]dummy[TAB]{"message":"world"}
+```
 
 ## Contributing
 
