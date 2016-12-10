@@ -7,19 +7,22 @@ module Fluent
       gzip: :gz
     }.freeze
 
+    config_param :path_prefix, :string, default: nil
+    config_param :path_key, :string, default: nil
+    config_param :format, :string, default: 'out_file'
+    config_param :append, :bool, default: false
     config_param :compress, default: nil do |val|
       c = SUPPORTED_COMPRESS[val.to_sym]
       raise ConfigError, "Unsupported compression algorithm '#{compress}'" unless c
       c
     end
 
-    config_param :format, :string, default: 'out_file'
-    config_param :path_key, :string, default: 'path'
-    config_param :append, :bool, default: false
-    config_param :path_prefix, :string, default: '/tmp'
-
     def configure(conf)
       super
+
+      raise ConfigError, "'path_prefix' parameter is required" unless @path_prefix
+      raise ConfigError, "'path_key' parameter is required" unless @path_key
+
       @formatter = Plugin.new_formatter(@format)
       @formatter.configure(conf)
 

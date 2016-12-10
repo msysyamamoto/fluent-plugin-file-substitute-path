@@ -20,11 +20,11 @@ Or install it yourself as:
 
 ## Configuration
 
-### path_prefix
+### path_prefix (required)
 
 Path prefix of output files.
 
-### path_key
+### path_key (required)
 
 Set the key of the field where part of the path is stored.
 
@@ -38,7 +38,7 @@ If set to `gzip`, the output file will be compressed. The default is `nil`.
 
 ### format
 
-see [http://docs.fluentd.org/articles/formatter-plugin-overview](http://docs.fluentd.org/articles/formatter-plugin-overview)
+see [http://docs.fluentd.org/articles/formatter-plugin-overview](http://docs.fluentd.org/articles/formatter-plugin-overview). The default is `out_file`.
 
 ### other
 
@@ -50,7 +50,7 @@ see [http://docs.fluentd.org/articles/output-plugin-overview#time-sliced-output-
 ```apache
 <match dummy>
     @type file_substitute_path
-    root_dir /var/log/subs
+    path_prefix /var/log/subs
     path_key path_is_here
 </match>
 ```
@@ -59,7 +59,7 @@ If your inputs is
 
 ```json
 {"path_is_here": "/oh/my/log", "message": "hello"}
-{"path_is_here": "/path/to/file", "message": "world"}
+{"path_is_here": "path/to/file", "message": "world"}
 ```
 
 File is created as follows

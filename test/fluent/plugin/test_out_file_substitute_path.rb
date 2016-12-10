@@ -22,8 +22,24 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
   end
 
   def test_configure
-    d = create_driver
-    assert_equal 'expath', d.instance.path_key
+    d1 = create_driver
+    assert_equal 'expath', d1.instance.path_key
+
+    err = assert_raise Fluent::ConfigError do
+      create_driver %[
+        buffer_path #{TMP_DIR}/test.*.buf
+        path_prefix #{TMP_DIR}
+      ]
+    end
+    assert_equal "'path_key' parameter is required", err.message
+
+    err = assert_raise Fluent::ConfigError do
+      create_driver %[
+        buffer_path #{TMP_DIR}/test.*.buf
+        path_key path
+      ]
+    end
+    assert_equal "'path_prefix' parameter is required", err.message 
   end
 
   def test_format
