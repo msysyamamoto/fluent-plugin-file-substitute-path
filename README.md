@@ -20,8 +20,9 @@ Or install it yourself as:
 
 ## Configuration
 
-### root_dir
+### path_prefix
 
+Path prefix of output files.
 
 ### path_key
 

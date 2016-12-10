@@ -8,7 +8,7 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
     path_key expath
     format hash
     buffer_path #{TMP_DIR}/test.*.buf
-    root_dir #{TMP_DIR}
+    path_prefix #{TMP_DIR}
   ]
 
   def setup
@@ -40,7 +40,7 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
       format hash
       buffer_path #{TMP_DIR}/test.*.buf
       time_slice_format %Y%m%d%H%M%S
-      root_dir #{TMP_DIR}
+      path_prefix #{TMP_DIR}
     ]
 
     time = Time.parse('2016-11-12 13:14:15 UTC')
@@ -60,7 +60,7 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
       buffer_path #{TMP_DIR}/test.*.buf
       time_slice_format %Y%m%d%H%M%S
       compress gzip
-      root_dir #{TMP_DIR}
+      path_prefix #{TMP_DIR}
     ]
 
     time = Time.parse('2016-11-12 13:14:15 UTC')
@@ -80,7 +80,7 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
       buffer_path #{TMP_DIR}/test.*.buf
       time_slice_format %Y%m%d
       append true
-      root_dir #{TMP_DIR}
+      path_prefix #{TMP_DIR}
     ]
 
     time = Time.parse('2016-11-12 13:14:15 UTC')
@@ -109,7 +109,7 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
       time_slice_format %Y%m%d
       append true
       compress gzip
-      root_dir #{TMP_DIR}
+      path_prefix #{TMP_DIR}
     ]
 
     time = Time.parse('2016-11-12 13:14:15 UTC')

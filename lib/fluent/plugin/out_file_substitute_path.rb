@@ -15,8 +15,8 @@ module Fluent
 
     config_param :format, :string, default: 'out_file'
     config_param :path_key, :string, default: 'path'
-    config_param :append, :bool, default: true
-    config_param :root_dir, :string, default: '/tmp'
+    config_param :append, :bool, default: false
+    config_param :path_prefix, :string, default: '/tmp'
 
     def configure(conf)
       super
@@ -85,11 +85,11 @@ module Fluent
 
       path = nil
       if @append
-        path = "#{@root_dir}/#{path_prefix}#{time_string}#{path_suffix}#{@suffix}"
+        path = "#{@path_prefix}/#{path_prefix}#{time_string}#{path_suffix}#{@suffix}"
       else
         i = 0
         begin
-          path = "#{@root_dir}/#{path_prefix}#{time_string}_#{i}#{path_suffix}#{@suffix}"
+          path = "#{@path_prefix}/#{path_prefix}#{time_string}_#{i}#{path_suffix}#{@suffix}"
           i += 1
         end while File.exist?(path)
       end
