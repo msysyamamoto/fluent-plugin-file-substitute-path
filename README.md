@@ -30,7 +30,7 @@ Set the key of the field where part of the path is stored.
 
 ### append
 
-If set to `true`, append the data to the file. The default is `true`.
+If set to `true`, append the data to the file. The default is `false`.
 
 ### compress
 
