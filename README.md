@@ -1,5 +1,8 @@
 # fluent-plugin-parameterized-path
 
+
+[![Build Status](https://travis-ci.org/msysyamamoto/fluent-plugin-parameterized-path.svg?branch=master)](https://travis-ci.org/msysyamamoto/fluent-plugin-parameterized-path)
+
 This plugin generates from the value of the specified field the path of the file to be output.
 
 ## Installation
