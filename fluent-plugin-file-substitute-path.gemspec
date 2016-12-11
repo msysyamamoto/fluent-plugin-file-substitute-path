@@ -3,14 +3,14 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
-  spec.name          = "fluent-plugin-file-substitute-path"
+  spec.name          = "fluent-plugin-parameterized-path"
   spec.version       = "0.1.0"
   spec.authors       = ["Masayasu Yamamoto"]
   spec.email         = ["m2yamamoto@gmail.com"]
 
   spec.summary       = %q{Apply the value of the specified field to part of the path.}
   spec.description   = spec.summary
-  spec.homepage      = "https://github.com/msysyamamoto/fluent-plugin-file-substitute-path"
+  spec.homepage      = "https://github.com/msysyamamoto/fluent-plugin-parameterized-path"
   spec.license       = "Apache License 2.0"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|

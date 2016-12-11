@@ -22,7 +22,7 @@ unless ENV.has_key?('VERBOSE')
   $log = nulllogger
 end
 
-require "fluent/plugin/out_file_substitute_path"
+require "fluent/plugin/out_parameterized_path"
 
 class Test::Unit::TestCase
 end

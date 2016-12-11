@@ -1,4 +1,4 @@
-# fluent-plugin-file-substitute-path
+# fluent-plugin-parameterized-path
 
 This plugin generates from the value of the specified field the path of the file to be output.
 
@@ -7,7 +7,7 @@ This plugin generates from the value of the specified field the path of the file
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'fluent-plugin-file-substitute-path'
+gem 'fluent-plugin-parameterized-path'
 ```
 
 And then execute:
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install fluent-plugin-file-substitute-path
+    $ gem install fluent-plugin-parameterized-path
 
 ## Configuration
 
@@ -49,7 +49,7 @@ see [http://docs.fluentd.org/articles/output-plugin-overview#time-sliced-output-
 
 ```apache
 <match dummy>
-    @type file_substitute_path
+    @type parameterized_path
     path_prefix /var/log/subs
     path_key path_is_here
 </match>
@@ -78,5 +78,5 @@ $ cat /var/log/subs/path/to/file.2016121314.log
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/msysyamamoto/fluent-plugin-file-substitute-path. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/msysyamamoto/fluent-plugin-parameterized-path. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 

@@ -1,6 +1,6 @@
 require 'helper'
 
-class FileSubstitutePathOutputTest < Test::Unit::TestCase
+class ParameterizedPathOutputTest < Test::Unit::TestCase
 
   TMP_DIR = File.dirname(__FILE__) + '/../tmp'
 
@@ -18,7 +18,7 @@ class FileSubstitutePathOutputTest < Test::Unit::TestCase
   end
 
   def create_driver(conf = CONFIG, tag='test')
-    Fluent::Test::TimeSlicedOutputTestDriver.new(Fluent::FileSubstitutePathOutput, tag).configure(conf)
+    Fluent::Test::TimeSlicedOutputTestDriver.new(Fluent::ParameterizedPathOutput, tag).configure(conf)
   end
 
   def test_configure

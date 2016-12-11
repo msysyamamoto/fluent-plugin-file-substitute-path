@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in fluent-plugin-file-substitute-path.gemspec
+# Specify your gem's dependencies in fluent-plugin-parameterized-path.gemspec
 gemspec
