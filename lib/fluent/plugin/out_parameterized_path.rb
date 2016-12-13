@@ -75,24 +75,24 @@ module Fluent
     private
 
     def generate_path(time_string, path)
-      path_prefix = ''
-      path_suffix = ''
+      path_head = ''
+      path_tail = ''
 
       if pos = path.index('*')
-        path_prefix = path[0, pos]
-        path_suffix = path[pos + 1..-1]
+        path_head = path[0, pos]
+        path_tail = path[pos + 1..-1]
       else
-        path_prefix = path + '.'
-        path_suffix = '.log'
+        path_head = path + '.'
+        path_tail = '.log'
       end
 
       path = nil
       if @append
-        path = "#{@path_prefix}/#{path_prefix}#{time_string}#{path_suffix}#{@suffix}"
+        path = "#{@path_prefix}/#{path_head}#{time_string}#{path_tail}#{@suffix}"
       else
         i = 0
         begin
-          path = "#{@path_prefix}/#{path_prefix}#{time_string}_#{i}#{path_suffix}#{@suffix}"
+          path = "#{@path_prefix}/#{path_head}#{time_string}_#{i}#{path_tail}#{@suffix}"
           i += 1
         end while File.exist?(path)
       end
