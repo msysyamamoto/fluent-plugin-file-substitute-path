@@ -61,9 +61,9 @@ module Fluent
 
         case @compress
         when nil
-          File.open(path, 'a', DEFAULT_FILE_PERMISSION) { |f| f.write(data) }
+          File.open(path, 'ab', DEFAULT_FILE_PERMISSION) { |f| f.write(data) }
         when :gz
-          File.open(path, 'a', DEFAULT_FILE_PERMISSION) do |f|
+          File.open(path, 'ab', DEFAULT_FILE_PERMISSION) do |f|
             Zlib::GzipWriter.wrap(f) { |gz| gz.write(data) }
           end
         end
