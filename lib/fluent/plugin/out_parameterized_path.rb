@@ -1,6 +1,6 @@
-module Fluent
-  class ParameterizedPathOutput < Fluent::TimeSlicedOutput
-    Plugin.register_output('parameterized_path', self)
+module Fluent::Plugin
+  class ParameterizedPathOutput < Output
+    Fluent::Plugin.register_output('parameterized_path', self)
 
     SUPPORTED_COMPRESS = {
       gz: :gz,
