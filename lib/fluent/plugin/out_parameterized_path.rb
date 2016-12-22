@@ -1,6 +1,9 @@
-module Fluent::Plugin
-  class ParameterizedPathOutput < Output
+module Fluent
+  class ParameterizedPathOutput < Fluent::TimeSlicedOutput
     Fluent::Plugin.register_output('parameterized_path', self)
+
+    DEFAULT_DIR_PERMISSION = 0755
+    DEFAULT_FILE_PERMISSION = 0644
 
     SUPPORTED_COMPRESS = {
       gz: :gz,
