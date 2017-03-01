@@ -53,7 +53,7 @@ module Fluent
       chunk.msgpack_each do |(path, data)|
         path = generate_path(chunk.key, path)
         if paths.key?(path)
-          paths[path] += data
+          paths[path] << data
         else
           paths[path] = data
         end

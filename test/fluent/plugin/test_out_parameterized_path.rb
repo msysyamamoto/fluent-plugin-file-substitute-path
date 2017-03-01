@@ -146,6 +146,29 @@ class ParameterizedPathOutputTest < Test::Unit::TestCase
     assert_equal "{\"message\"=>\"1\"}\n{\"message\"=>\"2\"}\n", contents
   end
 
+  def test_concat_item
+    conf = %[
+      path_key expath
+      format hash
+      buffer_path #{TMP_DIR}/test.*.buf
+      time_slice_format %Y%m%d
+      append true
+      path_prefix #{TMP_DIR}
+    ]
+
+    time = Time.parse('2016-11-12 13:14:15 UTC')
+    expect_path = "#{TMP_DIR}/access.log." + time.strftime('%Y%m%d.log')
+
+    d = create_driver conf
+    d.emit({'expath' => "access.log", 'message' => '1'}, time.to_i)
+    d.emit({'expath' => "access.log", 'message' => '2'}, time.to_i)
+    d.emit({'expath' => "access.log", 'message' => '3'}, time.to_i)
+    paths = d.run
+
+    contents = File.read(expect_path)
+    assert_equal "{\"message\"=>\"1\"}\n{\"message\"=>\"2\"}\n{\"message\"=>\"3\"}\n", contents
+  end
+
   def read_gzipped_file(path)
     # This is a copy from https://github.com/fluent/fluentd/blob/87015e1dbcd31b7e40d7387c5cfb3a228635df49/test/plugin/test_out_file.rb#L327-L339
     #
