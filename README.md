@@ -5,6 +5,10 @@
 
 This plugin generates from the value of the specified field the path of the file to be output.
 
+## Notice
+
+Fluentd v1.0 has [placeholders](https://docs.fluentd.org/v1.0/articles/buffer-section#placeholders). So this plugin will not support v1.0 or later. I recommend using placeholders instead of using this plugin.
+
 ## Installation
 
 Add this line to your application's Gemfile:
